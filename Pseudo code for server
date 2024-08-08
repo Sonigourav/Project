@@ -1,0 +1,52 @@
+4. Pseudocode:
+Server:
+function main() {
+    createSocket();
+    bindSocket(PORT);
+    listenForConnections();
+
+    while (true) {
+        clientSocket = acceptConnection();
+        handleClient(clientSocket);
+    }
+}
+
+function handleClient(socket) {
+    if (authenticateClient(socket)) {
+        request = receiveRequest(socket);
+        switch (request.type) {
+            case LIST_FILES:
+                sendFileList(socket);
+                break;
+            case GET_FILE:
+                sendFile(socket, request.filename);
+                break;
+            case UPLOAD_FILE:
+                receiveFile(socket, request.filename);
+                break;
+        }
+    }
+    closeSocket(socket);
+}
+
+function authenticateClient(socket) {
+    password = receiveData(socket);
+    return (password == PASSWORD);
+}
+
+function sendFileList(socket) {
+    files = listFiles();
+    sendData(socket, files);
+}
+
+function sendFile(socket, filename) {
+    data = readFile(filename);
+    encryptedData = encryptData(data);
+    sendData(socket, encryptedData);
+}
+
+function receiveFile(socket, filename) {
+    data = receiveData(socket);
+    decryptedData = decryptData(data);
+    writeFile(filename, decryptedData);
+}
